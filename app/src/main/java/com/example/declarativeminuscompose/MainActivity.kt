@@ -15,12 +15,20 @@ class MainActivity : ExCompActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            x.bind()
             VerticalLayout {
-                x.bind()
-                Text("value: ${x.value}")
-                Button(onClick = { x.value = x.value?.plus(1) }, "increment")
+                InnerData(x)
             }
 
         }
     }
+}
+
+fun ExComp.InnerData(x: MutableLiveData<Int>){
+    Text("value: ${x.value}", modifier = Modifier().textSize(30f))
+    Button(
+        modifier = Modifier().textSize(30f),
+        onClick = { x.value = x.value?.plus(1) },
+        text = "increment"
+    )
 }

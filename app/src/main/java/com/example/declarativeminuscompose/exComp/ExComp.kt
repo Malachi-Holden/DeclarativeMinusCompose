@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData
 
 class ExComp(val lifecycleOwner: LifecycleOwner, observer: Observer? = null, val factory: Context.() -> View) {
     val children = mutableListOf<ExComp>()
+    var modifier: Modifier? = null
 
     var observer = observer
         set(value) {
@@ -34,6 +35,7 @@ class ExComp(val lifecycleOwner: LifecycleOwner, observer: Observer? = null, val
     }
 
     fun buildView(context: Context): View = context.factory().apply {
+        modifier?.onUpdate?.let { it(this) }
         if (this is ViewGroup) children.forEach { child -> addView(child.buildView(context)) }
     }
 
