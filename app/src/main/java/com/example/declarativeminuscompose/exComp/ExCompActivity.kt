@@ -1,6 +1,5 @@
 package com.example.declarativeminuscompose.exComp
 
-import android.text.Spannable.Factory
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
@@ -17,7 +16,6 @@ open class ExCompActivity: AppCompatActivity(){
                     exComp.children.removeAll { true }
                     exComp.content()
                     setContentView(exComp.buildView(this@ExCompActivity))
-//                recreate()
                 }
             }
         }
