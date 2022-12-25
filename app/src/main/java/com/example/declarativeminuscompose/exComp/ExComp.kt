@@ -9,7 +9,6 @@ import androidx.lifecycle.LiveData
 
 class ExComp(val lifecycleOwner: LifecycleOwner, observer: Observer? = null, val factory: Context.() -> View) {
     val children = mutableListOf<ExComp>()
-    val listeners = mutableSetOf<LiveData<*>>()
 
     var observer = observer
         set(value) {
@@ -19,9 +18,12 @@ class ExComp(val lifecycleOwner: LifecycleOwner, observer: Observer? = null, val
 
     fun <T>LiveData<T>.bind(){
         if (observer?.listeners?.contains(this) == true) return
-        observer?.listeners?.add(this)
-        observe(lifecycleOwner){
-            value-> observer?.observe(this@ExComp)
+        observer?.listeners?.put(this, value as Any)
+        observe(lifecycleOwner){ newVal ->
+            val prev = observer?.listeners?.get(this)
+            if (prev == newVal) return@observe
+            observer?.listeners?.put(this, newVal as Any)
+            observer?.observe(this@ExComp)
         }
     }
 
@@ -40,7 +42,7 @@ class ExComp(val lifecycleOwner: LifecycleOwner, observer: Observer? = null, val
     }
 
     abstract class Observer{
-        val listeners = mutableSetOf<LiveData<*>>()
+        val listeners = mutableMapOf<LiveData<*>, Any>()
         abstract fun observe(exComp: ExComp)
     }
 }

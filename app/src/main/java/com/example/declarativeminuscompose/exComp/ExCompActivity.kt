@@ -9,8 +9,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 
 open class ExCompActivity: AppCompatActivity(){
-//    val activityExComomp = ExComp.default(this)
-
     fun setContent(content: ExComp.()->Unit){
         val exCompViewModel: ExCompViewModel by viewModels { ExCompViewModel.Factory(this) }
         exCompViewModel.activityExComp.also{ exComp ->

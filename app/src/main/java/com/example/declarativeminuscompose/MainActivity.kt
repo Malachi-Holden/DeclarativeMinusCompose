@@ -9,7 +9,7 @@ import com.example.declarativeminuscompose.exComp.coreWidgets.VerticalLayout
 import com.example.declarativeminuscompose.exComp.coreWidgets.Text
 
 class MainActivity : ExCompActivity() {
-    val x = MutableLiveData(8)
+    val x = MutableLiveData(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,14 +18,7 @@ class MainActivity : ExCompActivity() {
             VerticalLayout {
                 x.bind()
                 Text("value: ${x.value}")
-                x.value = 9
-//                var counter = addState(5) // very bad! causes infinite redrawing!!!!
-//                Text("The button: ${counter.value}")
-//                Button(
-//                    onClick = {
-//                        counter.value = 6
-//                },
-//                    "Yes, this is the button")
+                Button(onClick = { x.value = x.value?.plus(1) }, "increment")
             }
 
         }
