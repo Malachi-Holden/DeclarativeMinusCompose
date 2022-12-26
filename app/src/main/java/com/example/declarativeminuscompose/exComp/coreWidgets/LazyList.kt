@@ -15,13 +15,14 @@ enum class Orientation{
     Vertical
 }
 
-fun ExComp.LazyList(orientation: Orientation = Orientation.Vertical, content: LazyListScope.()->Unit){
+fun ExComp.LazyList(modifier: Modifier = Modifier(), orientation: Orientation = Orientation.Vertical, content: LazyListScope.()->Unit){
     val layoutOrientation = when(orientation){
         Orientation.Horizontal -> LinearLayout.HORIZONTAL
         Orientation.Vertical -> LinearLayout.VERTICAL
     }
-    Layout({
-        RecyclerView(this).apply {
+    BuildExComp(
+        modifier,
+        { RecyclerView(this).apply {
             layoutManager = LinearLayoutManager(this.context).apply { this.orientation = layoutOrientation }
             adapter = LazyListAdapter(LazyListScope(this@LazyList).apply(content))
         }

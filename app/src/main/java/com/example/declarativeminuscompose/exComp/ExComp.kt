@@ -7,7 +7,10 @@ import android.widget.FrameLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 
-class ExComp(val lifecycleOwner: LifecycleOwner, observer: Observer? = null, val factory: Context.() -> View) {
+class ExComp(val lifecycleOwner: LifecycleOwner,
+             observer: Observer? = null,
+             val treeId: List<String> = listOf(),
+             val factory: Context.() -> View) {
     val children = mutableListOf<ExComp>()
     var modifier: Modifier? = null
 
@@ -28,11 +31,20 @@ class ExComp(val lifecycleOwner: LifecycleOwner, observer: Observer? = null, val
         }
     }
 
-    fun Layout(root: Context.() -> ViewGroup, content: ExComp.() -> Unit){
+    fun nextTreeId() = treeId + "${children.size}"
+
+    fun BuildExComp(modifier: Modifier = Modifier(), root: Context.() -> View, content: ExComp.() -> Unit){
         children.add(
-            ExComp(lifecycleOwner, observer, root).apply(content)
+            ExComp(lifecycleOwner, observer, nextTreeId(), root).apply{
+                this.modifier = modifier
+                content()
+            }
         )
     }
+
+    fun <T>store(item: T) = observer?.store(treeId, item)
+
+    fun <T>retrieve(key: List<String>) = observer?.retrieve<T>(key)
 
     fun buildView(context: Context): View = context.factory().apply {
         var current = modifier
@@ -49,15 +61,13 @@ class ExComp(val lifecycleOwner: LifecycleOwner, observer: Observer? = null, val
 
     abstract class Observer{
         val listeners = mutableMapOf<LiveData<*>, Any>()
-        val rememberedData = mutableMapOf<Int, Any>()
-        var rememberedCount = 0
+        val rememberedData = mutableMapOf<List<String>, Any>()
 
-        fun <T>store(item: T): Int{
-            rememberedData[rememberedCount] = item as Any
-            return rememberedCount.also { rememberedCount ++ }
+        fun <T>store(key: List<String>, item: T){
+            rememberedData[key] = item as Any
         }
 
-        fun <T>retrieve(key: Int): T? = rememberedData[key] as? T
+        fun <T>retrieve(key: List<String>): T? = rememberedData[key] as? T
 
 
         abstract fun observe(exComp: ExComp)
