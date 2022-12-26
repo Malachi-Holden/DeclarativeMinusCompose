@@ -35,7 +35,11 @@ class ExComp(val lifecycleOwner: LifecycleOwner, observer: Observer? = null, val
     }
 
     fun buildView(context: Context): View = context.factory().apply {
-        modifier?.onUpdate?.let { it(this) }
+        var current = modifier
+        while (current?.onUpdate != null){
+            current.onUpdate?.let { it(this) }
+            current = current.next
+        }
         if (this is ViewGroup) children.forEach { child -> addView(child.buildView(context)) }
     }
 
@@ -45,6 +49,17 @@ class ExComp(val lifecycleOwner: LifecycleOwner, observer: Observer? = null, val
 
     abstract class Observer{
         val listeners = mutableMapOf<LiveData<*>, Any>()
+        val rememberedData = mutableMapOf<Int, Any>()
+        var rememberedCount = 0
+
+        fun <T>store(item: T): Int{
+            rememberedData[rememberedCount] = item as Any
+            return rememberedCount.also { rememberedCount ++ }
+        }
+
+        fun <T>retrieve(key: Int): T? = rememberedData[key] as? T
+
+
         abstract fun observe(exComp: ExComp)
     }
 }
