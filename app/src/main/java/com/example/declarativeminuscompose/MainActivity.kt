@@ -8,28 +8,31 @@ import com.example.declarativeminuscompose.exComp.*
 import com.example.declarativeminuscompose.exComp.coreWidgets.*
 
 class MainActivity : ExCompActivity() {
-    val x = MutableLiveData(0)
+    val sliderVal = MutableLiveData(0.1f)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            x.bind()
-            VerticalLayout {
-                Button({x.value?.let { x.value = it + 1 }}, "increment",
-                    modifier = Modifier()
-                    .width(1000)
-//                    .textSize(70f)
-                    .backgroundColor(255,255,0,0)
-                )
-                LazyList(Orientation.Vertical){
-                    repeat(200){
-                        item {
-                            Text("row $it")
-                        }
-                    }
-                }
-            }
+            SliderListView()
         }
     }
 }
+
+fun ExComp.SliderListView(){
+    val sliderVal = remember(MutableLiveData(0.1f))
+    sliderVal.bind()
+    VerticalLayout {
+        Slider(value = sliderVal.value ?: 0f, onValueChange = { sliderVal.value = it })
+        LazyList(orientation= Orientation.Vertical){
+            repeat(percentile(sliderVal.value)){
+                item {
+                    Text("row $it")
+                }
+            }
+        }
+
+    }
+}
+
+fun percentile(frac: Float?) = ((frac ?: 0f)*100).toInt()

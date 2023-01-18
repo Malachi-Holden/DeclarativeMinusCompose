@@ -32,7 +32,7 @@ fun Modifier.width(width: Int) = define { view->
 
 fun Modifier.height(height: Int) = define { view->
     view.layoutParams = ViewGroup.LayoutParams(
-        view.layoutParams.width, height
+        view.layoutParams?.width ?: view.minimumWidth, height
     )
 }
 

@@ -10,15 +10,11 @@ import androidx.lifecycle.viewmodel.CreationExtras
 open class ExCompActivity: AppCompatActivity(){
     fun setContent(content: ExComp.()->Unit){
         val exCompViewModel: ExCompViewModel by viewModels { ExCompViewModel.Factory(this) }
-        exCompViewModel.activityExComp.also{ exComp ->
-            exComp.observer = object: ExComp.Observer() {
-                override fun observe(exComp: ExComp) {
-                    exComp.children.removeAll { true }
-                    exComp.content()
-                    setContentView(exComp.buildView(this@ExCompActivity))
-                }
+        exCompViewModel.activityExComp //.also{ exComp ->
+            .observe { exComp ->
+                exComp.content()
+                setContentView(exComp.buildView(this))
             }
-        }
     }
 }
 
