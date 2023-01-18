@@ -1,15 +1,14 @@
 package com.example.declarativeminuscompose
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.LinearLayout
 import androidx.lifecycle.MutableLiveData
-import com.example.declarativeminuscompose.exComp.*
-import com.example.declarativeminuscompose.exComp.coreWidgets.*
+import com.holden.declarativeminuscompose.exComp.ExCompActivity
+import com.holden.declarativeminuscompose.exComp.coreWidgets.LazyList
+import com.holden.declarativeminuscompose.exComp.coreWidgets.Slider
+import com.holden.declarativeminuscompose.exComp.coreWidgets.Text
+import com.holden.declarativeminuscompose.exComp.coreWidgets.VerticalLayout
 
 class MainActivity : ExCompActivity() {
-    val sliderVal = MutableLiveData(0.1f)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -19,12 +18,12 @@ class MainActivity : ExCompActivity() {
     }
 }
 
-fun ExComp.SliderListView(){
+fun com.holden.declarativeminuscompose.exComp.ExComp.SliderListView(){
     val sliderVal = remember(MutableLiveData(0.1f))
     sliderVal.bind()
     VerticalLayout {
         Slider(value = sliderVal.value ?: 0f, onValueChange = { sliderVal.value = it })
-        LazyList(orientation= Orientation.Vertical){
+        LazyList(orientation= com.holden.declarativeminuscompose.exComp.coreWidgets.Orientation.Vertical){
             repeat(percentile(sliderVal.value)){
                 item {
                     Text("row $it")

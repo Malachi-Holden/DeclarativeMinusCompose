@@ -1,4 +1,4 @@
-package com.example.declarativeminuscompose.exComp
+package com.holden.declarativeminuscompose.exComp
 
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -10,7 +10,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 open class ExCompActivity: AppCompatActivity(){
     fun setContent(content: ExComp.()->Unit){
         val exCompViewModel: ExCompViewModel by viewModels { ExCompViewModel.Factory(this) }
-        exCompViewModel.activityExComp //.also{ exComp ->
+        exCompViewModel.activityExComp
             .observe { exComp ->
                 exComp.content()
                 setContentView(exComp.buildView(this))

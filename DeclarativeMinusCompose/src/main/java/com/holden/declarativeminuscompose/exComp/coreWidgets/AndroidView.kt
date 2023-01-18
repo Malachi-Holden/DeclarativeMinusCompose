@@ -1,9 +1,9 @@
-package com.example.declarativeminuscompose.exComp.coreWidgets
+package com.holden.declarativeminuscompose.exComp.coreWidgets
 
 import android.content.Context
 import android.view.View
-import com.example.declarativeminuscompose.exComp.ExComp
-import com.example.declarativeminuscompose.exComp.Modifier
+import com.holden.declarativeminuscompose.exComp.ExComp
+import com.holden.declarativeminuscompose.exComp.Modifier
 
 fun ExComp.AndroidView(modifier: Modifier = Modifier(), factory: ExComp.(Context)-> View)
     = BuildExComp(modifier, factory){}
