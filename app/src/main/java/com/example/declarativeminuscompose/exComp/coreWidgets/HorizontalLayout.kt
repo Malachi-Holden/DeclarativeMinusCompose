@@ -7,7 +7,7 @@ import com.example.declarativeminuscompose.exComp.Modifier
 fun ExComp.HorizontalLayout(modifier: Modifier = Modifier(), content: ExComp.()->Unit){
     BuildExComp(
         modifier,
-        { LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL } },
+        { context-> LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL } },
         content
     )
 }

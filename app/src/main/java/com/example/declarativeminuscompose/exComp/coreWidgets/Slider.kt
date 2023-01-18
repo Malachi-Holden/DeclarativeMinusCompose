@@ -7,8 +7,8 @@ import com.google.android.material.slider.Slider
 fun ExComp.Slider(modifier: Modifier = Modifier(),
                   value: Float,
                   onValueChange: (Float)->Unit)
-    = BuildExComp(modifier, {
-        Slider(this).apply {
+    = BuildExComp(modifier, { context ->
+        Slider(context).apply {
             this.value = value
             addOnChangeListener{ _, newValue, _ ->
                 onValueChange(newValue)

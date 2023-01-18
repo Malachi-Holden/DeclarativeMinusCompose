@@ -7,7 +7,7 @@ import com.example.declarativeminuscompose.exComp.Modifier
 fun ExComp.VerticalLayout(modifier: Modifier = Modifier(), content: ExComp.()->Unit){
     BuildExComp(
         modifier,
-        { LinearLayout(this).apply { orientation = LinearLayout.VERTICAL } },
+        { context->LinearLayout(context).apply { orientation = LinearLayout.VERTICAL } },
         content
     )
 }

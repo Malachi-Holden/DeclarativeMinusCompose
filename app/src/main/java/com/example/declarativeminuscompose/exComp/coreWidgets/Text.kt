@@ -6,6 +6,6 @@ import com.example.declarativeminuscompose.exComp.Modifier
 
 
 fun ExComp.Text(text: String, modifier: Modifier = Modifier())
-    = BuildExComp(modifier, {
-        TextView(this).apply { setText(text) }
+    = BuildExComp(modifier, { context ->
+        TextView(context).apply { setText(text) }
 }){}

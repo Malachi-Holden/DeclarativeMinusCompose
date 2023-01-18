@@ -7,48 +7,65 @@ import android.widget.FrameLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 
-class ExComp(val lifecycleOwner: LifecycleOwner,
-             observer: Observer? = null,
-             val treeId: List<String> = listOf(),
-             val factory: Context.() -> View) {
+class ExComp(
+    val lifecycleOwner: LifecycleOwner,
+    val comptext: Comptext = Comptext(lifecycleOwner),
+    val treeId: List<String> = listOf(),
+    val factory: ExComp.(Context) -> View
+) {
     val children = mutableListOf<ExComp>()
     var modifier: Modifier? = null
 
-    var observer = observer
-        set(value) {
-            field = value
-            field?.observe(this)
-        }
 
-    fun <T>LiveData<T>.bind(){
-        if (observer?.listeners?.contains(this) == true) return
-        observer?.listeners?.put(this, value as Any)
-        observe(lifecycleOwner){ newVal ->
-            val prev = observer?.listeners?.get(this)
-            if (prev == newVal) return@observe
-            observer?.listeners?.put(this, newVal as Any)
-            observer?.observe(this@ExComp)
+    fun observe(observation: (ExComp) -> Unit) {
+        comptext.setObserver(this) {
+            children.removeAll { true }
+            itemId = 0
+            observation(it)
         }
+    }
+
+    fun <T> LiveData<T>.bind() {
+        comptext.observer?.bind(this@ExComp, this, value)
     }
 
     fun nextTreeId() = treeId + "${children.size}"
 
-    fun BuildExComp(modifier: Modifier = Modifier(), root: Context.() -> View, content: ExComp.() -> Unit){
+    fun BuildExComp(
+        modifier: Modifier = Modifier(),
+        root: ExComp.(Context) -> View,
+        content: ExComp.() -> Unit
+    ) {
         children.add(
-            ExComp(lifecycleOwner, observer, nextTreeId(), root).apply{
+            ExComp(lifecycleOwner, comptext, nextTreeId(), root).apply {
                 this.modifier = modifier
                 content()
             }
         )
     }
 
-    fun <T>store(item: T) = observer?.store(treeId, item)
+    var itemId = 0
 
-    fun <T>retrieve(key: List<String>) = observer?.retrieve<T>(key)
+    fun <T> store(item: T) =
+        comptext.retrieveDatabase(treeId).put(itemId, item as Any).also { itemId++ }
 
-    fun buildView(context: Context): View = context.factory().apply {
+    fun <T> retrieve(id: Int) = comptext
+        .retrieveDatabase(treeId)[id] as? T
+
+    fun <T> remember(initial: T): T {
+        val item = retrieve<T>(itemId)
+        if (item != null) {
+            itemId++
+            return item
+        }
+        store(initial)
+        itemId++
+        return initial
+    }
+
+    fun buildView(context: Context): View = factory(context).apply {
         var current = modifier
-        while (current?.onUpdate != null){
+        while (current?.onUpdate != null) {
             current.onUpdate?.let { it(this) }
             current = current.next
         }
@@ -56,20 +73,58 @@ class ExComp(val lifecycleOwner: LifecycleOwner,
     }
 
     companion object {
-        fun default(lifecycleOwner: LifecycleOwner) = ExComp(lifecycleOwner) { FrameLayout(this) }
+        fun default(lifecycleOwner: LifecycleOwner) =
+            ExComp(lifecycleOwner) { context -> FrameLayout(context) }
     }
 
-    abstract class Observer{
+    abstract class Observer(
+        val lifecycleOwner: LifecycleOwner
+    ) {
         val listeners = mutableMapOf<LiveData<*>, Any>()
-        val rememberedData = mutableMapOf<List<String>, Any>()
 
-        fun <T>store(key: List<String>, item: T){
-            rememberedData[key] = item as Any
+        fun <T> bind(exComp: ExComp, liveData: LiveData<T>, value: T?) {
+            if (listeners.contains(liveData)) return
+            listeners[liveData] = value as Any
+            liveData.observe(lifecycleOwner) { newVal ->
+                val prev = listeners[liveData]
+                if (prev == newVal) return@observe
+                listeners[liveData] = newVal as Any
+                observe(exComp)
+            }
         }
 
-        fun <T>retrieve(key: List<String>): T? = rememberedData[key] as? T
-
-
         abstract fun observe(exComp: ExComp)
+    }
+
+    class Comptext(val lifecycleOwner: LifecycleOwner, observer: Observer? = null) {
+        private var _observer = observer
+        val observer: Observer?
+            get() = _observer
+
+        val rememberedData = mutableMapOf<List<String>, MutableMap<Int, Any>>()
+
+        fun setObserver(exComp: ExComp, observation: (ExComp) -> Unit) {
+            _observer = object : Observer(lifecycleOwner) {
+                override fun observe(exComp: ExComp) {
+                    observation(exComp)
+                }
+            }
+            _observer?.observe(exComp)
+        }
+
+        fun storeDatabase(key: List<String>, database: MutableMap<Int, Any>) {
+            rememberedData[key] = database
+        }
+
+        fun retrieveDatabase(key: List<String>): MutableMap<Int, Any> {
+            val database = rememberedData[key]
+            if (database != null) {
+                return database
+            }
+            val result = mutableMapOf<Int, Any>()
+            rememberedData[key] = result
+            return result
+        }
+
     }
 }
