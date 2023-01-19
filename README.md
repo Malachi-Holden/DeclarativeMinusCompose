@@ -13,8 +13,12 @@ The library is available as a .aar binary in the releases page. Download the rel
 Subclass `ExcompActivity` and in your `onCreate`, replace `setContentView` with `setContent` and give it a lambda, like this
 
 ```
-setContent {
-  // Declare UI here
+class MainActivity : ExCompActivity() {
+  override fun onCreate(savedInstanceState: Bundle?) {
+    setContent {
+      // Declare UI here
+    }
+  }
 }
 ```
 
