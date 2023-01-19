@@ -1,8 +1,8 @@
-package com.example.declarativeminuscompose.exComp.coreWidgets
+package com.holden.declarativeminuscompose.exComp.coreWidgets
 
 import android.widget.Button
-import com.example.declarativeminuscompose.exComp.ExComp
-import com.example.declarativeminuscompose.exComp.Modifier
+import com.holden.declarativeminuscompose.exComp.ExComp
+import com.holden.declarativeminuscompose.exComp.Modifier
 
 fun ExComp.Button(modifier: Modifier = Modifier(), onClick: ()->Unit, text: String)
     = BuildExComp(modifier, { context ->

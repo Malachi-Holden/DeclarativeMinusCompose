@@ -1,8 +1,8 @@
-package com.example.declarativeminuscompose.exComp.coreWidgets
+package com.holden.declarativeminuscompose.exComp.coreWidgets
 
 import android.widget.LinearLayout
-import com.example.declarativeminuscompose.exComp.ExComp
-import com.example.declarativeminuscompose.exComp.Modifier
+import com.holden.declarativeminuscompose.exComp.ExComp
+import com.holden.declarativeminuscompose.exComp.Modifier
 
 fun ExComp.HorizontalLayout(modifier: Modifier = Modifier(), content: ExComp.()->Unit){
     BuildExComp(

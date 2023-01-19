@@ -1,4 +1,4 @@
-package com.example.declarativeminuscompose.exComp.coreWidgets
+package com.holden.declarativeminuscompose.exComp.coreWidgets
 
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -8,9 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.example.declarativeminuscompose.exComp.ExComp
-import com.example.declarativeminuscompose.exComp.Modifier
-import com.example.declarativeminuscompose.util.Container
+import com.holden.declarativeminuscompose.exComp.ExComp
+import com.holden.declarativeminuscompose.exComp.Modifier
+import com.holden.declarativeminuscompose.util.Container
 
 enum class Orientation {
     Horizontal,

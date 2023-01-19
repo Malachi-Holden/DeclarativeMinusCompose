@@ -1,8 +1,8 @@
-package com.example.declarativeminuscompose.exComp.coreWidgets
+package com.holden.declarativeminuscompose.exComp.coreWidgets
 
 import android.widget.TextView
-import com.example.declarativeminuscompose.exComp.ExComp
-import com.example.declarativeminuscompose.exComp.Modifier
+import com.holden.declarativeminuscompose.exComp.ExComp
+import com.holden.declarativeminuscompose.exComp.Modifier
 
 
 fun ExComp.Text(text: String, modifier: Modifier = Modifier())

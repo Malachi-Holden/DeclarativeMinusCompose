@@ -1,4 +1,4 @@
-package com.example.declarativeminuscompose.exComp
+package com.holden.declarativeminuscompose.exComp
 
 import android.content.Context
 import android.view.View

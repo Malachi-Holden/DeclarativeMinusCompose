@@ -1,15 +1,12 @@
 package com.example.declarativeminuscompose
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.LinearLayout
 import androidx.lifecycle.MutableLiveData
-import com.example.declarativeminuscompose.exComp.*
-import com.example.declarativeminuscompose.exComp.coreWidgets.*
+import com.holden.declarativeminuscompose.exComp.ExComp
+import com.holden.declarativeminuscompose.exComp.ExCompActivity
+import com.holden.declarativeminuscompose.exComp.coreWidgets.*
 
 class MainActivity : ExCompActivity() {
-    val sliderVal = MutableLiveData(0.1f)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
