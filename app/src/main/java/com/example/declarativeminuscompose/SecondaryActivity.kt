@@ -12,25 +12,6 @@ import com.holden.declarativeminuscompose.exComp.coreWidgets.VerticalLayout
 class SecondaryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(ExCompView(this, this){
-            val counterData = remember(MutableLiveData(0))
-            counterData.bind()
-            VerticalLayout {
-                Button(onClick = { counterData.value = (counterData.value ?: 0) + 1 }, text = "increment")
-                CrazyEmbeddingView(6, "${counterData.value}")
-            }
-        })
-    }
-}
-
-// cool demonstration that it works
-fun ExComp.CrazyEmbeddingView(depth: Int, message: String){
-    if (depth <= 0){
-        Text(message)
-        return
-    }
-    VerticalLayout {
-        CrazyEmbeddingView(depth - 1, message)
-        CrazyEmbeddingView(depth - 1, message)
+        setContentView(R.layout.activity_secondary)
     }
 }

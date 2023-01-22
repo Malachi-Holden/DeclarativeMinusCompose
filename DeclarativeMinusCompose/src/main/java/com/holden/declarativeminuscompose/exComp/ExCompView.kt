@@ -15,10 +15,10 @@ class ExCompView(
     val exComp = ExComp.default(lifecycleOwner, ExComp.Comptext())
 
     init {
-        exComp.observe { ex->
-            ex.content()
+        exComp.observe {
+            exComp.content()
             removeAllViews()
-            addView(ex.buildView(context))
+            addView(exComp.buildView(context))
         }
     }
 }
