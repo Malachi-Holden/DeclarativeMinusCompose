@@ -18,6 +18,12 @@ class ExComp(
     val children = mutableListOf<ExComp>()
     var modifier: Modifier? = null
 
+    var view: View? = null
+
+    fun invalidate(){
+        view = null
+    }
+
     fun observe(observation: () -> Unit) {
         comptext.setObserver {
             children.removeAll { true }
@@ -66,12 +72,17 @@ class ExComp(
         return initial
     }
 
-    fun buildView(context: Context): View = factory(context).apply {
+    fun View.applyModifier(){
         var current = modifier
         while (current?.onUpdate != null) {
             current.onUpdate?.let { it(this) }
             current = current.next
         }
+    }
+
+    fun buildView(context: Context): View = (view ?: factory(context)).apply {
+        view = this
+        applyModifier()
         if (this is ViewGroup) children.forEach { child -> addView(child.buildView(context)) }
     }
 
