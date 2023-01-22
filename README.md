@@ -29,7 +29,7 @@ setContent {
   VerticalLayout {
     Text("Hello. My name is")
     HorizontalLayout {
-      Text("Inigo")
+      Text("Inigo ")
       Text("Montoya")
     }
   }
@@ -41,7 +41,7 @@ To avoid crazy levels of embedding, you can separate out your UI into chunks. In
 ```
 fun Excomp.InigoMontoyaEnding(){
   HorizontalLayout {
-      Text("Inigo")
+      Text("Inigo ")
       Text("Montoya")
     }
 }
@@ -62,4 +62,19 @@ setContent {
 
 #### in a Fragment
 
-This functionality isn't ready yet!
+To use in a fragment, you override onCreateView and return an ExCompView, like this:
+
+```
+override fun onCreateView( ...): View {
+    return ExCompView(requireActivity(), requireContext()){
+          VerticalLayout {
+            Text("Hello. My name is")
+            HorizontalLayout {
+              Text("Inigo ")
+              Text("Montoya")
+            }
+          }
+    }
+}
+```
+Note that the excompview needs 2 parameters in addition to the lambda where you build the UI. The first is a `LifeCycleOwner`, and the second is a `Context`. In a fragment, you can provide them using `requireActivity()` and  `requireContext()` respectively.
