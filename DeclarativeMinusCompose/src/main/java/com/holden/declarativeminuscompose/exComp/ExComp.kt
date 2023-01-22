@@ -131,4 +131,5 @@ class ExComp(
     }
 }
 
-class DeallocatedLifecycleException: Exception()
+class DeallocatedLifecycleException:
+    Exception("Attempted to access a lifecycle that has been destroyed and deallocated")

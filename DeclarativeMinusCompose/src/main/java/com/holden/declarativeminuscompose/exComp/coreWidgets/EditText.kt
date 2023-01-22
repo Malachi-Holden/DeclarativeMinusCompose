@@ -3,11 +3,9 @@ package com.holden.declarativeminuscompose.exComp.coreWidgets
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
-import android.widget.EditText
 import androidx.appcompat.widget.AppCompatEditText
 import com.holden.declarativeminuscompose.exComp.ExComp
 import com.holden.declarativeminuscompose.exComp.Modifier
-import com.holden.declarativeminuscompose.util.BetterEditText
 
 fun ExComp.EditText(
     modifier: Modifier = Modifier(),
