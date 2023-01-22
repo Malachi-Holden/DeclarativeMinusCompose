@@ -53,7 +53,7 @@ class LazyListScope(val parent: ExComp) {
     fun item(content: ExComp.() -> Unit) {
         children.add(
             ExComp(
-                parent.lifecycleOwner,
+                parent.lifecycleOwner(),
                 parent.comptext,
                 parent.nextTreeId()
             ) { context -> FrameLayout(context) }.apply(content)

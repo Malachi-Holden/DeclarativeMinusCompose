@@ -6,28 +6,31 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import java.lang.ref.WeakReference
 
 class ExComp(
-    val lifecycleOwner: LifecycleOwner,
-    val comptext: Comptext = Comptext(lifecycleOwner),
+    lifecycleOwner: LifecycleOwner,
+    val comptext: Comptext,
     val treeId: List<String> = listOf(),
     val factory: ExComp.(Context) -> View
 ) {
+    val lifecycleOwnerRef = WeakReference(lifecycleOwner)
     val children = mutableListOf<ExComp>()
     var modifier: Modifier? = null
 
-
-    fun observe(observation: (ExComp) -> Unit) {
-        comptext.setObserver(this) {
+    fun observe(observation: () -> Unit) {
+        comptext.setObserver {
             children.removeAll { true }
             itemId = 0
-            observation(it)
+            observation()
         }
     }
 
     fun <T> LiveData<T>.bind() {
-        comptext.observer?.bind(this@ExComp, this, value)
+        comptext.observer?.bind(lifecycleOwner(), this, value)
     }
+
+    fun lifecycleOwner() = lifecycleOwnerRef.get() ?: throw DeallocatedLifecycleException()
 
     fun nextTreeId() = treeId + "${children.size}"
 
@@ -37,7 +40,7 @@ class ExComp(
         content: ExComp.() -> Unit
     ) {
         children.add(
-            ExComp(lifecycleOwner, comptext, nextTreeId(), root).apply {
+            ExComp(lifecycleOwner(), comptext, nextTreeId(), root).apply {
                 this.modifier = modifier
                 content()
             }
@@ -73,43 +76,43 @@ class ExComp(
     }
 
     companion object {
-        fun default(lifecycleOwner: LifecycleOwner) =
-            ExComp(lifecycleOwner) { context -> FrameLayout(context) }
+        fun default(lifecycleOwner: LifecycleOwner, comptext: Comptext) =
+            ExComp(lifecycleOwner, comptext) { context -> FrameLayout(context) }
     }
 
-    abstract class Observer(
-        val lifecycleOwner: LifecycleOwner
-    ) {
+    abstract class Observer{
         val listeners = mutableMapOf<LiveData<*>, Any>()
 
-        fun <T> bind(exComp: ExComp, liveData: LiveData<T>, value: T?) {
+        fun <T> bind(lifecycleOwner: LifecycleOwner, liveData: LiveData<T>, value: T?) {
             if (listeners.contains(liveData)) return
             listeners[liveData] = value as Any
             liveData.observe(lifecycleOwner) { newVal ->
                 val prev = listeners[liveData]
                 if (prev == newVal) return@observe
                 listeners[liveData] = newVal as Any
-                observe(exComp)
+                observe()
             }
         }
 
-        abstract fun observe(exComp: ExComp)
+        abstract fun observe()
     }
 
-    class Comptext(val lifecycleOwner: LifecycleOwner, observer: Observer? = null) {
+    class Comptext(
+        observer: Observer? = null
+    ) {
         private var _observer = observer
         val observer: Observer?
             get() = _observer
 
         val rememberedData = mutableMapOf<List<String>, MutableMap<Int, Any>>()
 
-        fun setObserver(exComp: ExComp, observation: (ExComp) -> Unit) {
-            _observer = object : Observer(lifecycleOwner) {
-                override fun observe(exComp: ExComp) {
-                    observation(exComp)
+        fun setObserver(observation: () -> Unit) {
+            _observer = object : Observer() {
+                override fun observe() {
+                    observation()
                 }
             }
-            _observer?.observe(exComp)
+            _observer?.observe()
         }
 
         fun storeDatabase(key: List<String>, database: MutableMap<Int, Any>) {
@@ -125,6 +128,8 @@ class ExComp(
             rememberedData[key] = result
             return result
         }
-
     }
 }
+
+class DeallocatedLifecycleException:
+    Exception("Attempted to access a lifecycle that has been destroyed and deallocated")
