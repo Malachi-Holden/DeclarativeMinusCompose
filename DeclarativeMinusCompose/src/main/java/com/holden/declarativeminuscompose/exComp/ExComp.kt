@@ -6,13 +6,15 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import java.lang.ref.WeakReference
 
 class ExComp(
-    val lifecycleOwner: LifecycleOwner,
+    lifecycleOwner: LifecycleOwner,
     val comptext: Comptext,
     val treeId: List<String> = listOf(),
     val factory: ExComp.(Context) -> View
 ) {
+    val lifecycleOwnerRef = WeakReference(lifecycleOwner)
     val children = mutableListOf<ExComp>()
     var modifier: Modifier? = null
 
@@ -30,8 +32,10 @@ class ExComp(
     }
 
     fun <T> LiveData<T>.bind() {
-        comptext.observer?.bind(lifecycleOwner, this@ExComp, this, value)
+        comptext.observer?.bind(lifecycleOwner(), this@ExComp, this, value)
     }
+
+    fun lifecycleOwner() = lifecycleOwnerRef.get() ?: throw DeallocatedLifecycleException()
 
     fun nextTreeId() = treeId + "${children.size}"
 
@@ -41,7 +45,7 @@ class ExComp(
         content: ExComp.() -> Unit
     ) {
         children.add(
-            ExComp(lifecycleOwner, comptext, nextTreeId(), root).apply {
+            ExComp(lifecycleOwner(), comptext, nextTreeId(), root).apply {
                 this.modifier = modifier
                 content()
             }
@@ -132,3 +136,5 @@ class ExComp(
 
     }
 }
+
+class DeallocatedLifecycleException: Exception()
