@@ -12,7 +12,7 @@ class ExCompView(
     content: ExComp.() -> Unit
 ) :
     FrameLayout(context) {
-    val exComp = ExComp.default(lifecycleOwner)
+    val exComp = ExComp.default(lifecycleOwner, ExComp.Comptext())
 
     init {
         exComp.observe { ex->

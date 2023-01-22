@@ -9,12 +9,16 @@ import androidx.lifecycle.LiveData
 
 class ExComp(
     val lifecycleOwner: LifecycleOwner,
-    val comptext: Comptext = Comptext(lifecycleOwner),
+    val comptext: Comptext,
     val treeId: List<String> = listOf(),
     val factory: ExComp.(Context) -> View
 ) {
     val children = mutableListOf<ExComp>()
     var modifier: Modifier? = null
+
+    init {
+        // TODO: register lifecycle events and get rid of lifecyle owner after destruction
+    }
 
 
     fun observe(observation: (ExComp) -> Unit) {
@@ -26,7 +30,7 @@ class ExComp(
     }
 
     fun <T> LiveData<T>.bind() {
-        comptext.observer?.bind(this@ExComp, this, value)
+        comptext.observer?.bind(lifecycleOwner, this@ExComp, this, value)
     }
 
     fun nextTreeId() = treeId + "${children.size}"
@@ -73,16 +77,14 @@ class ExComp(
     }
 
     companion object {
-        fun default(lifecycleOwner: LifecycleOwner) =
-            ExComp(lifecycleOwner) { context -> FrameLayout(context) }
+        fun default(lifecycleOwner: LifecycleOwner, comptext: Comptext) =
+            ExComp(lifecycleOwner, comptext) { context -> FrameLayout(context) }
     }
 
-    abstract class Observer(
-        val lifecycleOwner: LifecycleOwner
-    ) {
+    abstract class Observer{
         val listeners = mutableMapOf<LiveData<*>, Any>()
 
-        fun <T> bind(exComp: ExComp, liveData: LiveData<T>, value: T?) {
+        fun <T> bind(lifecycleOwner: LifecycleOwner, exComp: ExComp, liveData: LiveData<T>, value: T?) {
             if (listeners.contains(liveData)) return
             listeners[liveData] = value as Any
             liveData.observe(lifecycleOwner) { newVal ->
@@ -96,7 +98,9 @@ class ExComp(
         abstract fun observe(exComp: ExComp)
     }
 
-    class Comptext(val lifecycleOwner: LifecycleOwner, observer: Observer? = null) {
+    class Comptext(
+        observer: Observer? = null
+    ) {
         private var _observer = observer
         val observer: Observer?
             get() = _observer
@@ -104,7 +108,7 @@ class ExComp(
         val rememberedData = mutableMapOf<List<String>, MutableMap<Int, Any>>()
 
         fun setObserver(exComp: ExComp, observation: (ExComp) -> Unit) {
-            _observer = object : Observer(lifecycleOwner) {
+            _observer = object : Observer() {
                 override fun observe(exComp: ExComp) {
                     observation(exComp)
                 }

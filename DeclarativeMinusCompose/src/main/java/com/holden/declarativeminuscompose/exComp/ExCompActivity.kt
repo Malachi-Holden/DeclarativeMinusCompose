@@ -9,23 +9,16 @@ import androidx.lifecycle.viewmodel.CreationExtras
 
 open class ExCompActivity: AppCompatActivity(){
     fun setContent(content: ExComp.()->Unit){
-        val exCompViewModel: ExCompViewModel by viewModels { ExCompViewModel.Factory(this) }
-        exCompViewModel.activityExComp
-            .observe { exComp ->
-                exComp.content()
-                setContentView(exComp.buildView(this))
+        val exCompViewModel: ExCompViewModel by viewModels()
+        val exComp = ExComp.default(this, exCompViewModel.comptext)
+        exComp
+            .observe { ex ->
+                ex.content()
+                setContentView(ex.buildView(this))
             }
     }
 }
 
-class ExCompViewModel(lifecycleOwner: LifecycleOwner): ViewModel(){
-    val activityExComp = ExComp.default(lifecycleOwner)
-
-    companion object {
-        fun Factory(lifecycleOwner: LifecycleOwner): ViewModelProvider.Factory = object : ViewModelProvider.Factory{
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                return ExCompViewModel(lifecycleOwner) as T
-            }
-        }
-    }
+class ExCompViewModel(): ViewModel(){
+    var comptext = ExComp.Comptext()
 }
