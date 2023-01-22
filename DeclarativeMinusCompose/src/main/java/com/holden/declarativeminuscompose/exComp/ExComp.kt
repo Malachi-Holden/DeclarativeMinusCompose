@@ -18,21 +18,16 @@ class ExComp(
     val children = mutableListOf<ExComp>()
     var modifier: Modifier? = null
 
-    init {
-        // TODO: register lifecycle events and get rid of lifecyle owner after destruction
-    }
-
-
-    fun observe(observation: (ExComp) -> Unit) {
-        comptext.setObserver(this) {
+    fun observe(observation: () -> Unit) {
+        comptext.setObserver {
             children.removeAll { true }
             itemId = 0
-            observation(it)
+            observation()
         }
     }
 
     fun <T> LiveData<T>.bind() {
-        comptext.observer?.bind(lifecycleOwner(), this@ExComp, this, value)
+        comptext.observer?.bind(lifecycleOwner(), this, value)
     }
 
     fun lifecycleOwner() = lifecycleOwnerRef.get() ?: throw DeallocatedLifecycleException()
@@ -88,18 +83,18 @@ class ExComp(
     abstract class Observer{
         val listeners = mutableMapOf<LiveData<*>, Any>()
 
-        fun <T> bind(lifecycleOwner: LifecycleOwner, exComp: ExComp, liveData: LiveData<T>, value: T?) {
+        fun <T> bind(lifecycleOwner: LifecycleOwner, liveData: LiveData<T>, value: T?) {
             if (listeners.contains(liveData)) return
             listeners[liveData] = value as Any
             liveData.observe(lifecycleOwner) { newVal ->
                 val prev = listeners[liveData]
                 if (prev == newVal) return@observe
                 listeners[liveData] = newVal as Any
-                observe(exComp)
+                observe()
             }
         }
 
-        abstract fun observe(exComp: ExComp)
+        abstract fun observe()
     }
 
     class Comptext(
@@ -111,13 +106,13 @@ class ExComp(
 
         val rememberedData = mutableMapOf<List<String>, MutableMap<Int, Any>>()
 
-        fun setObserver(exComp: ExComp, observation: (ExComp) -> Unit) {
+        fun setObserver(observation: () -> Unit) {
             _observer = object : Observer() {
-                override fun observe(exComp: ExComp) {
-                    observation(exComp)
+                override fun observe() {
+                    observation()
                 }
             }
-            _observer?.observe(exComp)
+            _observer?.observe()
         }
 
         fun storeDatabase(key: List<String>, database: MutableMap<Int, Any>) {
@@ -133,7 +128,6 @@ class ExComp(
             rememberedData[key] = result
             return result
         }
-
     }
 }
 

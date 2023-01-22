@@ -12,13 +12,13 @@ open class ExCompActivity: AppCompatActivity(){
         val exCompViewModel: ExCompViewModel by viewModels()
         val exComp = ExComp.default(this, exCompViewModel.comptext)
         exComp
-            .observe { ex ->
-                ex.content()
-                setContentView(ex.buildView(this))
+            .observe {
+                exComp.content()
+                setContentView(exComp.buildView(this))
             }
     }
 }
 
-class ExCompViewModel(): ViewModel(){
+class ExCompViewModel: ViewModel(){
     var comptext = ExComp.Comptext()
 }
